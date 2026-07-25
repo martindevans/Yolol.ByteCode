@@ -1,0 +1,7 @@
+/Yolol.ByteCode/bin
+/Yolol.ByteCode/obj
+/Yolol.ByteCode.Tests/bin
+/Yolol.ByteCode.Tests/obj
+/.vs
+/Benchmark/bin
+/Benchmark/obj

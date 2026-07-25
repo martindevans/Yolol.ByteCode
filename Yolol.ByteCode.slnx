@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Benchmark/Benchmark.csproj" Id="829813aa-49b9-4f3d-8a33-c0c6daa84e76" />
+  <Project Path="Yolol.ByteCode.Tests/Yolol.ByteCode.Tests.csproj" />
+  <Project Path="Yolol.ByteCode/Yolol.ByteCode.csproj" />
+</Solution>
