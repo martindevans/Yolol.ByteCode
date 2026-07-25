@@ -46,12 +46,14 @@ public struct CpuState
         stack[_stackPointer++] = value;
     }
 
-    private void Swap(Span<Value> stack)
+    private void Push(YString value, Span<Value> stack)
     {
-        var a = Pop(stack);
-        var b = Pop(stack);
-        Push(a, stack);
-        Push(b, stack);
+        stack[_stackPointer++] = new Value(YString.Trim(value, MaxStringLength));
+    }
+
+    private void Push(Number value, Span<Value> stack)
+    {
+        stack[_stackPointer++] = value;
     }
 
     private void SetProgramLine(Value input)
@@ -164,16 +166,18 @@ public struct CpuState
                     case Op.Add:
                     {
                         // Never throws!
-                        Swap(stack);
-                        Push(Pop(stack) + Pop(stack), stack);
+                        var b = Pop(stack);
+                        var a = Pop(stack);
+                        Push(a + b, stack);
                         break;
                     }
 
                     case Op.Sub:
                     {
                         // Never throws!
-                        Swap(stack);
-                        Push(Pop(stack) - Pop(stack), stack);
+                        var b = Pop(stack);
+                        var a = Pop(stack);
+                        Push(a - b, stack);
                         break;
                     }
 
@@ -187,7 +191,7 @@ public struct CpuState
                             return;
                         }
                         
-                        Push(a * b, stack);
+                        Push(Value.UnsafeMultiply(a, b), stack);
                         break;
                     }
 
@@ -201,7 +205,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(a / b, stack);
+                        Push(Value.UnsafeDiv(a, b), stack);
                         break;
                     }
 
@@ -215,7 +219,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(a % b, stack);
+                        Push(Value.UnsafeMod(a, b), stack);
                         break;
                     }
 
@@ -229,7 +233,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.Exponent(a, b), stack);
+                        Push(Value.UnsafeExponent(a, b), stack);
                         break;
                     }
 
@@ -329,7 +333,7 @@ public struct CpuState
                             return;
                         }
                         
-                        Push(Value.Abs(a), stack);
+                        Push(Value.UnsafeAbs(a), stack);
                         break;
                     }
 
@@ -342,7 +346,7 @@ public struct CpuState
                             return;
                         }
                         
-                        Push(new Value(-a), stack);
+                        Push(Value.UnsafeNegate(a), stack);
                         break;
                     }
 
@@ -355,7 +359,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.Factorial(a), stack);
+                        Push(Value.UnsafeFactorial(a), stack);
                         break;
                     }
 
@@ -368,7 +372,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.Sqrt(a), stack);
+                        Push(Value.UnsafeSqrt(a), stack);
                         break;
                     }
 
@@ -381,7 +385,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.Cos(a), stack);
+                        Push(Value.UnsafeCos(a), stack);
                         break;
                     }
 
@@ -394,7 +398,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.Sin(a), stack);
+                        Push(Value.UnsafeSin(a), stack);
                         break;
                     }
 
@@ -407,7 +411,7 @@ public struct CpuState
                             return;
                         }
                         
-                        Push(Value.Tan(a), stack);
+                        Push(Value.UnsafeTan(a), stack);
                         break;
                     }
 
@@ -420,7 +424,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.ArcCos(a), stack);
+                        Push(Value.UnsafeArcCos(a), stack);
                         break;
                     }
 
@@ -433,7 +437,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.ArcSin(a), stack);
+                        Push(Value.UnsafeArcSin(a), stack);
                         break;
                     }
 
@@ -446,7 +450,7 @@ public struct CpuState
                             return;
                         }
 
-                        Push(Value.ArcTan(a), stack);
+                        Push(Value.UnsafeAtan(a), stack);
                         break;
                     }
 
