@@ -8,9 +8,13 @@ namespace Yolol.ByteCode;
 public struct CpuState
 {
     private int _programLine;
-    public Number YololLineNumber => (Number)_programLine + Number.One;
-    
-    public int ProgramCounter;
+    public Number YololLineNumber
+    {
+        get => (Number)_programLine + Number.One;
+        set => _programLine = (int)value - 1;
+    }
+
+    private int _programCounter;
         
     public CompiledProgram Program;
         
@@ -100,7 +104,7 @@ public struct CpuState
 
         // Initialise PC to the start of the line
         var lineStart = Program.LineStarts.Span[_programLine];
-        ProgramCounter = lineStart;
+        _programCounter = lineStart;
             
         // Convert everything to spawns
         var instructions = Program.Instructions.Span;
@@ -120,7 +124,7 @@ public struct CpuState
             // Execute all of the instructions in the line
             while (true)
             {
-                var instruction = instructions[ProgramCounter++];
+                var instruction = instructions[_programCounter++];
                 switch (instruction.Op)
                 {
                     case Op.EndOfLine:
@@ -155,12 +159,12 @@ public struct CpuState
                     {
                         var value = Pop(stack);
                         if (!value.ToBool())
-                            ProgramCounter = lineStart + labels[instruction.Operand];
+                            _programCounter = lineStart + labels[instruction.Operand];
                         break;
                     }
 
                     case Op.Branch:
-                        ProgramCounter = lineStart + labels[instruction.Operand];
+                        _programCounter = lineStart + labels[instruction.Operand];
                         break;
 
                     case Op.Add:
