@@ -76,10 +76,20 @@ public struct Instruction
     {
         return new Instruction { Op = Op.Div, Operand = 0 };
     }
+    
+    public static Instruction DivideSmallInt(byte value)
+    {
+        return new Instruction { Op = Op.DivSmallInt, Operand = value };
+    }
 
     public static Instruction Modulo()
     {
         return new Instruction { Op = Op.Mod, Operand = 0 };
+    }
+
+    public static Instruction ModuloSmallInt(byte value)
+    {
+        return new Instruction { Op = Op.ModSmallInt, Operand = value };
     }
 
     public static Instruction Exponent()
@@ -90,6 +100,11 @@ public struct Instruction
     public static Instruction EqualTo()
     {
         return new Instruction { Op = Op.Eq, Operand = 0 };
+    }
+    
+    public static Instruction EqualToSmallInt(byte value)
+    {
+        return new Instruction { Op = Op.EqSmallInt, Operand = value };
     }
 
     public static Instruction NotEqualTo()
@@ -212,6 +227,26 @@ public struct Instruction
         return new Instruction { Op = Op.PreDecInternal, Operand = vid };
     }
 
+    public static Instruction PreIncVarExternal(byte vid)
+    {
+        return new Instruction { Op = Op.IncVarExternal, Operand = vid };
+    }
+
+    public static Instruction PreIncVarInternal(byte vid)
+    {
+        return new Instruction { Op = Op.IncVarInternal, Operand = vid };
+    }
+
+    public static Instruction PreDecVarExternal(byte vid)
+    {
+        return new Instruction { Op = Op.DecVarExternal, Operand = vid };
+    }
+
+    public static Instruction PreDecVarInternal(byte vid)
+    {
+        return new Instruction { Op = Op.DecVarInternal, Operand = vid };
+    }
+
     public static Instruction RuntimeError()
     {
         return new Instruction { Op = Op.RuntimeError, Operand = 0 };
@@ -280,9 +315,22 @@ public enum Op
     Sub,
     Mul,
     Div,
+    
+    /// <summary>
+    /// Divide by a small non-zero integer, stored in the operand
+    /// </summary>
+    DivSmallInt,
+    
     Mod,
+    
+    /// <summary>
+    /// Modulo by a small non-zero integer, stored in the operand
+    /// </summary>
+    ModSmallInt,
+    
     Expo,
     Eq,
+    EqSmallInt,
     Neq,
     Gt,
     Gteq,
@@ -302,8 +350,14 @@ public enum Op
     Asin,
     Atan,
     Pop,
+    
     PreIncExternal,
     PreIncInternal,
     PreDecExternal,
     PreDecInternal,
+
+    IncVarExternal,
+    IncVarInternal,
+    DecVarExternal,
+    DecVarInternal,
 }

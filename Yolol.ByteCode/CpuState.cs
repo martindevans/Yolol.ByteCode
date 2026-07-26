@@ -36,7 +36,7 @@ public struct CpuState
     }
 
     #region stack
-    private ref Value Peek(Span<Value> stack)
+    private readonly ref Value Peek(Span<Value> stack)
     {
         return ref stack[_stackPointer - 1];
     }
@@ -149,9 +149,6 @@ public struct CpuState
             switch (instruction.Op)
             {
                 case Op.EndOfLine:
-                    SetProgramLine(YololLineNumber + Number.One);
-                    return;
-
                 case Op.RuntimeError:
                     RuntimeError();
                     return;
@@ -222,14 +219,14 @@ public struct CpuState
                 {
                     ref var b = ref Pop(stack);
                     ref var a = ref Peek(stack);
-                    if (Value.WillMulThrow(a, b))
+                    if (Value.WillMulThrow(in a, in b))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeMultiply(a, b);
+                    a = Value.UnsafeMultiply(in a, in b);
                     break;
                 }
 
@@ -237,14 +234,29 @@ public struct CpuState
                 {
                     ref var b = ref Pop(stack);
                     ref var a = ref Peek(stack);
-                    if (Value.WillDivThrow(a, b))
+                    if (Value.WillDivThrow(in a, in b))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeDiv(a, b);
+                    a = Value.UnsafeDiv(in a, in b);
+                    break;
+                }
+
+                case Op.DivSmallInt:
+                {
+                    ref var a = ref Peek(stack);
+                    var b = (Number)instruction.Operand;
+                    if (a.Type != Type.Number)
+                    {
+                        Pop(stack);
+                        RuntimeError();
+                        return;
+                    }
+
+                    a = Value.UnsafeDiv(in a, in b);
                     break;
                 }
 
@@ -252,29 +264,44 @@ public struct CpuState
                 {
                     ref var b = ref Pop(stack);
                     ref var a = ref Peek(stack);
-                    if (Value.WillModThrow(a, b))
+                    if (Value.WillModThrow(in a, in b))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeMod(a, b);
+                    a = Value.UnsafeMod(in a, in b);
                     break;
                 }
+
+                case Op.ModSmallInt:
+                {
+                    ref var a = ref Peek(stack);
+                    var b = (Number)instruction.Operand;
+                    if (a.Type != Type.Number)
+                    {
+                        Pop(stack);
+                        RuntimeError();
+                        return;
+                    }
+
+                    a = Value.UnsafeMod(in a, in b);
+                    break;
+                    }
 
                 case Op.Expo:
                 {
                     ref var b = ref Pop(stack);
                     ref var a = ref Peek(stack);
-                    if (Value.WillExponentThrow(a, b))
+                    if (Value.WillExponentThrow(in a, in b))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeExponent(a, b);
+                    a = Value.UnsafeExponent(in a, in b);
                     break;
                 }
 
@@ -283,6 +310,15 @@ public struct CpuState
                     // Never throws!
                     ref var b = ref Pop(stack);
                     ref var a = ref Peek(stack);
+
+                    a = new Value(a == b);
+                    break;
+                }
+
+                case Op.EqSmallInt:
+                {
+                    ref var a = ref Peek(stack);
+                    var b = (Number)instruction.Operand;
 
                     a = new Value(a == b);
                     break;
@@ -369,140 +405,140 @@ public struct CpuState
                 case Op.Abs:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillAbsThrow(a))
+                    if (Value.WillAbsThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeAbs(a);
+                    a = Value.UnsafeAbs(in a);
                     break;
                 }
 
                 case Op.Neg:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillNegateThrow(a))
+                    if (Value.WillNegateThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeNegate(a);
+                    a = Value.UnsafeNegate(in a);
                     break;
                 }
 
                 case Op.Fac:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillFactorialThrow(a))
+                    if (Value.WillFactorialThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeFactorial(a);
+                    a = Value.UnsafeFactorial(in a);
                     break;
                 }
 
                 case Op.Sqrt:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillSqrtThrow(a))
+                    if (Value.WillSqrtThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeSqrt(a);
+                    a = Value.UnsafeSqrt(in a);
                     break;
                 }
 
                 case Op.Cos:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillCosThrow(a))
+                    if (Value.WillCosThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeCos(a);
+                    a = Value.UnsafeCos(in a);
                     break;
                 }
 
                 case Op.Sin:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillSinThrow(a))
+                    if (Value.WillSinThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeSin(a);
+                    a = Value.UnsafeSin(in a);
                     break;
                 }
 
                 case Op.Tan:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillTanThrow(a))
+                    if (Value.WillTanThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeTan(a);
+                    a = Value.UnsafeTan(in a);
                     break;
                 }
 
                 case Op.Acos:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillArcCosThrow(a))
+                    if (Value.WillArcCosThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeArcCos(a);
+                    a = Value.UnsafeArcCos(in a);
                     break;
                 }
 
                 case Op.Asin:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillArcSinThrow(a))
+                    if (Value.WillArcSinThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeArcSin(a);
+                    a = Value.UnsafeArcSin(in a);
                     break;
                 }
 
                 case Op.Atan:
                 {
                     ref var a = ref Peek(stack);
-                    if (Value.WillAtanThrow(a))
+                    if (Value.WillAtanThrow(in a))
                     {
                         Pop(stack);
                         RuntimeError();
                         return;
                     }
 
-                    a = Value.UnsafeAtan(a);
+                    a = Value.UnsafeAtan(in a);
                     break;
                 }
 
@@ -533,7 +569,7 @@ public struct CpuState
                 case Op.PreDecExternal:
                 {
                     var result = externals[instruction.Operand];
-                    if (Value.WillDecThrow(result))
+                    if (Value.WillDecThrow(in result))
                     {
                         RuntimeError();
                         return;
@@ -548,7 +584,7 @@ public struct CpuState
                 case Op.PreDecInternal:
                 {
                     var result = internals[instruction.Operand];
-                    if (Value.WillDecThrow(result))
+                    if (Value.WillDecThrow(in result))
                     {
                         RuntimeError();
                         return;
@@ -557,6 +593,48 @@ public struct CpuState
                     result--;
                     internals[instruction.Operand] = result;
                     Push(result, stack);
+                    break;
+                }
+
+                case Op.IncVarExternal:
+                {
+                    ref var result = ref externals[instruction.Operand];
+                    result = Value.Increment(result, MaxStringLength);
+                    break;
+                }
+
+                case Op.IncVarInternal:
+                {
+                    ref var result = ref internals[instruction.Operand];
+                    result = Value.Increment(result, MaxStringLength);
+                    break;
+                }
+
+                case Op.DecVarExternal:
+                {
+                    ref var result = ref externals[instruction.Operand];
+
+                    if (Value.WillDecThrow(in result))
+                    {
+                        RuntimeError();
+                        return;
+                    }
+
+                    result--;
+                    break;
+                }
+
+                case Op.DecVarInternal:
+                {
+                    ref var result = ref internals[instruction.Operand];
+
+                    if (Value.WillDecThrow(in result))
+                    {
+                        RuntimeError();
+                        return;
+                    }
+
+                    result--;
                     break;
                 }
 

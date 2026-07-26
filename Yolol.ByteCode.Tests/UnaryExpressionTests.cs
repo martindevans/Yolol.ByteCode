@@ -231,6 +231,23 @@ public class UnaryExpressionTests
         Assert.AreEqual((Value)6, st.GetVariable("b"));
     }
 
+    [TestMethod]
+    public void PreDecExternal()
+    {
+        var st = Test(":a = 7 b = --:a");
+
+        Assert.AreEqual((Value)6, st.GetVariable(":a"));
+        Assert.AreEqual((Value)6, st.GetVariable("b"));
+    }
+
+    [TestMethod]
+    public void DecExternal()
+    {
+        var st = Test(":a=7 :a--");
+
+        Assert.AreEqual((Value)6, st.GetVariable(":a"));
+    }
+
     //[TestMethod]
     //public void PostDec()
     //{

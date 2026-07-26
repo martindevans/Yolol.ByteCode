@@ -91,10 +91,20 @@ public class Emitter
     {
         _output.Add(Instruction.Divide());
     }
+    
+    public void EmitDivideSmallInt(byte value)
+    {
+        _output.Add(Instruction.DivideSmallInt(value));
+    }
 
     public void EmitEqualTo()
     {
         _output.Add(Instruction.EqualTo());
+    }
+    
+    public void EmitEqualToSmallInt(byte value)
+    {
+        _output.Add(Instruction.EqualToSmallInt(value));
     }
     
     public void EmitNotEqualTo()
@@ -125,6 +135,11 @@ public class Emitter
     public void EmitModulo()
     {
         _output.Add(Instruction.Modulo());
+    }
+
+    public void EmitModuloSmallInt(byte value)
+    {
+        _output.Add(Instruction.ModuloSmallInt(value));
     }
 
     public void EmitAnd()
@@ -212,7 +227,23 @@ public class Emitter
         else
             _output.Add(Instruction.PreDecInternal(_internals[name]));
     }
-    
+
+    public void EmitPreIncrementVar(VariableName name)
+    {
+        if (name.IsExternal)
+            _output.Add(Instruction.PreIncVarExternal(_externals[name]));
+        else
+            _output.Add(Instruction.PreIncVarInternal(_internals[name]));
+    }
+
+    public void EmitPreDecrementVar(VariableName name)
+    {
+        if (name.IsExternal)
+            _output.Add(Instruction.PreDecVarExternal(_externals[name]));
+        else
+            _output.Add(Instruction.PreDecVarInternal(_internals[name]));
+    }
+
     public void EmitPop()
     {
         _output.Add(Instruction.Pop());

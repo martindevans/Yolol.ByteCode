@@ -187,6 +187,19 @@ public class ConvertLineVisitor
 
     protected override BaseExpression Visit(Divide div)
     {
+        // Are we dividing by a constant number
+        if (div.Right is ConstantNumber cn)
+        {
+            // Is the number a non-zero small integer (byte)
+            var ival = (byte)(int)cn.Value;
+            if (cn.Value == (Number)ival && ival != 0)
+            {
+                base.Visit(div.Left);
+                _emitter.EmitDivideSmallInt(ival);
+                return div;
+            }
+        }
+        
         base.Visit(div);
         _emitter.EmitDivide();
         return div;
@@ -194,6 +207,32 @@ public class ConvertLineVisitor
 
     protected override BaseExpression Visit(EqualTo eq)
     {
+        // Are we comparing to a constant number
+        if (eq.Right is ConstantNumber cnr)
+        {
+            // Is the number a small integer (byte)
+            var ival = (byte)(int)cnr.Value;
+            if (cnr.Value == (Number)ival)
+            {
+                base.Visit(eq.Left);
+                _emitter.EmitEqualToSmallInt(ival);
+                return eq;
+            }
+        }
+
+        // Are we comparing to a constant number
+        if (eq.Left is ConstantNumber cnl)
+        {
+            // Is the number a small integer (byte)
+            var ival = (byte)(int)cnl.Value;
+            if (cnl.Value == (Number)ival)
+            {
+                base.Visit(eq.Right);
+                _emitter.EmitEqualToSmallInt(ival);
+                return eq;
+            }
+        }
+
         base.Visit(eq);
         _emitter.EmitEqualTo();
         return eq;
@@ -236,6 +275,19 @@ public class ConvertLineVisitor
 
     protected override BaseExpression Visit(Modulo mod)
     {
+        // Are we modding by a constant number
+        if (mod.Right is ConstantNumber cn)
+        {
+            // Is the number a non-zero small integer (byte)
+            var ival = (byte)(int)cn.Value;
+            if (cn.Value == (Number)ival && ival != 0)
+            {
+                base.Visit(mod.Left);
+                _emitter.EmitModuloSmallInt(ival);
+                return mod;
+            }
+        }
+
         base.Visit(mod);
         _emitter.EmitModulo();
         return mod;
@@ -265,21 +317,6 @@ public class ConvertLineVisitor
     #endregion
 
     #region unary expressions
-
-    //public override BaseExpression Visit(BaseExpression expression)
-    //{
-    //    if (expression is BaseUnaryExpression u)
-    //    {
-    //        Visit(u.Parameter);
-    //    }
-    //    else if (expression is BaseBinaryExpression b)
-    //    {
-    //        Visit(b.Left);
-    //        Visit(b.Right);
-    //    }
-
-    //    return base.Visit(expression);
-    //}
 
     protected override BaseExpression Visit(Factorial fac)
     {
@@ -390,11 +427,34 @@ public class ConvertLineVisitor
 
     #endregion
 
-    protected override BaseExpression Visit(Bracketed brk)
-        => Visit(brk.Parameter);
-
     protected override BaseStatement Visit(ExpressionWrapper expr)
     {
+        if (expr.Expression is PostIncrement poinc)
+        {
+            // Deliberately the wrong increment type! Maintains compatibility with base Yolol.
+            _emitter.EmitPreIncrementVar(poinc.Name);
+            return expr;
+        }
+
+        if (expr.Expression is PreIncrement preinc)
+        {
+            _emitter.EmitPreIncrementVar(preinc.Name);
+            return expr;
+        }
+
+        if (expr.Expression is PostDecrement podec)
+        {
+            // Deliberately the wrong increment type! Maintains compatibility with base Yolol.
+            _emitter.EmitPreDecrementVar(podec.Name);
+            return expr;
+        }
+
+        if (expr.Expression is PreDecrement predec)
+        {
+            _emitter.EmitPreDecrementVar(predec.Name);
+            return expr;
+        }
+
         var r = base.Visit(expr);
 
         // The wrapped expression left a value on the stack. Pop it off now.
