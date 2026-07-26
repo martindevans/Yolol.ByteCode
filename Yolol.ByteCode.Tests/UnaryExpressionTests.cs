@@ -175,7 +175,7 @@ public class UnaryExpressionTests
     [TestMethod]
     public void Sine()
     {
-        var st = Test("a = sin(90)");
+        var st = Test("x=90 a = sin(x)");
 
         Assert.AreEqual((Value)1, st.GetVariable("a"));
     }
@@ -183,7 +183,7 @@ public class UnaryExpressionTests
     [TestMethod]
     public void Cos90()
     {
-        var st = Test("a = cos(90)");
+        var st = Test("x=90 a = cos(x)");
 
         Assert.AreEqual((Value)0, st.GetVariable("a"));
     }
@@ -191,7 +191,7 @@ public class UnaryExpressionTests
     [TestMethod]
     public void Cos0()
     {
-        var st = Test("a = cos(0)");
+        var st = Test("x=0 a = cos(x)");
 
         Assert.AreEqual((Value)1, st.GetVariable("a"));
     }
@@ -199,7 +199,7 @@ public class UnaryExpressionTests
     [TestMethod]
     public void Tan()
     {
-        var st = Test("a = tan(45)");
+        var st = Test("x=45 a = tan(x)");
 
         Assert.AreEqual((Value)1, st.GetVariable("a"));
     }

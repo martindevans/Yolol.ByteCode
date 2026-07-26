@@ -87,7 +87,7 @@ public class ConvertLineVisitor
         {
             var value = Math.Clamp((int)constNum.Value, 1, _maxLineNumber);
             var cid = _emitter.CreateConstant((Number)value);
-            _emitter.EmitLoadConstant(cid);
+            _emitter.EmitLoadConstantNumber(cid);
         }
         else
         {
@@ -106,10 +106,41 @@ public class ConvertLineVisitor
 
     #region basic expressions
 
+    public override BaseExpression Visit(BaseExpression expression)
+    {
+        if (expression.IsConstant && expression is not ConstantNumber && expression is not ConstantString)
+            if (TryStaticEvaluate(expression))
+                return expression;
+
+        return base.Visit(expression);
+    }
+
+    private bool TryStaticEvaluate<T>(T expr)
+        where T : BaseExpression
+    {
+        if (expr.IsConstant)
+        {
+            var v = Execution.Extensions.BaseExpressionExtensions.TryStaticEvaluate(expr, out var runtimeError);
+            if (v.HasValue)
+            {
+                Visit(v.Value.ToConstant());
+                return true;
+            }
+
+            if (runtimeError)
+            {
+                _emitter.EmitRuntimeError();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected override BaseExpression Visit(ConstantNumber con)
     {
         var cid = _emitter.CreateConstant(con.Value);
-        _emitter.EmitLoadConstant(cid);
+        _emitter.EmitLoadConstantNumber(cid);
 
         return con;
     }
@@ -117,7 +148,7 @@ public class ConvertLineVisitor
     protected override BaseExpression Visit(ConstantString str)
     {
         var cid = _emitter.CreateConstant(new Value(str.Value));
-        _emitter.EmitLoadConstant(cid);
+        _emitter.EmitLoadConstantString(cid);
 
         return str;
     }
@@ -367,7 +398,7 @@ public class ConvertLineVisitor
         var r = base.Visit(expr);
 
         // The wrapped expression left a value on the stack. Pop it off now.
-        _emitter.Pop();
+        _emitter.EmitPop();
 
         return r;
     }

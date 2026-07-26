@@ -18,6 +18,18 @@ public class StatementTests
     }
 
     [TestMethod]
+    public void StaticRuntimeError()
+    {
+        var st = Test([
+            "a = 1/0 goto 3",
+            "a = 1",
+            "a = 2"
+        ], 2);
+
+        Assert.AreEqual((Value)1, st.GetVariable("a"));
+    }
+
+    [TestMethod]
     public void Assignment()
     {
         var st = Test("a = 2");

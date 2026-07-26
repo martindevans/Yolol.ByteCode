@@ -27,9 +27,14 @@ public struct Instruction
         return new Instruction { Op = Op.Goto, Operand = 0 };
     }
 
-    public static Instruction LoadConst(byte cid)
+    public static Instruction LoadConstString(byte cid)
     {
-        return new Instruction { Op = Op.LoadConst, Operand = cid };
+        return new Instruction { Op = Op.LoadConstString, Operand = cid };
+    }
+
+    public static Instruction LoadConstNum(byte cid)
+    {
+        return new Instruction { Op = Op.LoadConstNum, Operand = cid };
     }
 
     public static Instruction LoadExternal(byte external)
@@ -206,6 +211,11 @@ public struct Instruction
     {
         return new Instruction { Op = Op.PreDecInternal, Operand = vid };
     }
+
+    public static Instruction RuntimeError()
+    {
+        return new Instruction { Op = Op.RuntimeError, Operand = 0 };
+    }
 }
 
 public enum Op
@@ -214,76 +224,86 @@ public enum Op
     /// <summary>
     /// Marks the end of a line. Causes the interpreter to break execution.
     /// </summary>
-    EndOfLine = 0,
+    EndOfLine,
 
     /// <summary>
     /// Take value from execution stack and store to an external variable
     /// </summary>
-    AssignExternal = 1,
+    AssignExternal,
     
     /// <summary>
     /// Take value from execution stack and store to an internal variable
     /// </summary>
-    AssignInternal = 2,
+    AssignInternal,
     
     /// <summary>
     /// Go to the line number currently on the stack
     /// </summary>
-    Goto = 3,
+    Goto,
     
     /// <summary>
     /// Load a constant value onto the stack
     /// </summary>
-    LoadConst = 4,
-    
+    LoadConstString,
+
+    /// <summary>
+    /// Load a constant value onto the stack
+    /// </summary>
+    LoadConstNum,
+
     /// <summary>
     /// Load an external var onto the stack
     /// </summary>
-    LoadExternal = 5,
+    LoadExternal,
     
     /// <summary>
     /// Load an internal var onto the stack
     /// </summary>
-    LoadInternal = 6,
+    LoadInternal,
 
     /// <summary>
     /// Do a jump if the value on the stack is false
     /// </summary>
-    BranchIfFalse = 7,
+    BranchIfFalse,
     
     /// <summary>
     /// Do an unconditional jump
     /// </summary>
-    Branch = 8,
-    
-    Add = 9,
-    Sub = 10,
-    Mul = 11,
-    Div = 12,
-    Mod = 13,
-    Expo = 14,
-    Eq = 15,
-    Neq = 16,
-    Gt = 17,
-    Gteq = 18,
-    Lt = 19,
-    Lteq = 20,
-    And = 21,
-    Or = 22,
-    Not = 23,
-    Abs = 24,
-    Neg = 25,
-    Fac = 26,
-    Sqrt = 27,
-    Cos = 28,
-    Sin = 29,
-    Tan = 30,
-    Acos = 31,
-    Asin = 32,
-    Atan = 33,
-    Pop = 34,
-    PreIncExternal = 35,
-    PreIncInternal = 36,
-    PreDecExternal = 37,
-    PreDecInternal = 38,
+    Branch,
+
+    /// <summary>
+    /// Immediately trigger a runtime error
+    /// </summary>
+    RuntimeError,
+
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Expo,
+    Eq,
+    Neq,
+    Gt,
+    Gteq,
+    Lt,
+    Lteq,
+    And,
+    Or,
+    Not,
+    Abs,
+    Neg,
+    Fac,
+    Sqrt,
+    Cos,
+    Sin,
+    Tan,
+    Acos,
+    Asin,
+    Atan,
+    Pop,
+    PreIncExternal,
+    PreIncInternal,
+    PreDecExternal,
+    PreDecInternal,
 }

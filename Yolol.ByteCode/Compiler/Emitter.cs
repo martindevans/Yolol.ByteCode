@@ -44,9 +44,14 @@ public class Emitter
         _output.Add(Instruction.Goto());
     }
 
-    public void EmitLoadConstant(byte cid)
+    public void EmitLoadConstantNumber(byte cid)
     {
-        _output.Add(Instruction.LoadConst(cid));
+        _output.Add(Instruction.LoadConstNum(cid));
+    }
+
+    public void EmitLoadConstantString(byte cid)
+    {
+        _output.Add(Instruction.LoadConstString(cid));
     }
 
     public void EmitLoadVariable(VariableName name)
@@ -207,8 +212,8 @@ public class Emitter
         else
             _output.Add(Instruction.PreDecInternal(_internals[name]));
     }
-
-    public void Pop()
+    
+    public void EmitPop()
     {
         _output.Add(Instruction.Pop());
     }
@@ -216,6 +221,11 @@ public class Emitter
     public void EmitEol()
     {
         _output.Add(Instruction.Eol());
+    }
+
+    public void EmitRuntimeError()
+    {
+        _output.Add(Instruction.RuntimeError());
     }
 
     #region labels
